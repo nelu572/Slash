@@ -12,8 +12,6 @@ public class PlayerMovement : MonoBehaviour
     private Collider2D collider2d;
     private PlayerInputHandler playerInputHandler;
 
-    public bool IsGrounded { get; private set; }
-
     private void Awake()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
@@ -26,8 +24,6 @@ public class PlayerMovement : MonoBehaviour
         float moveInput = playerInputHandler.MoveInput;
         Vector2 velocity = rigidbody2d.linearVelocity;
 
-        IsGrounded = OnGround();
-
         float rate = moveInput == 0f ? deceleration : acceleration;
         velocity.x = Mathf.MoveTowards(velocity.x, moveInput * moveSpeed, rate * Time.fixedDeltaTime);
         rigidbody2d.linearVelocity = velocity;
@@ -39,7 +35,6 @@ public class PlayerMovement : MonoBehaviour
             return;
 
         rigidbody2d.linearVelocity = new Vector2(rigidbody2d.linearVelocity.x, jumpSpeed);
-        IsGrounded = false;
     }
 
     private bool OnGround()
