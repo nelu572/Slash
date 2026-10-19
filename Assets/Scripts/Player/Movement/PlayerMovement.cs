@@ -15,12 +15,12 @@ public class PlayerMovement : MonoBehaviour
     private PlayerInputHandler playerInputHandler;
     private PlayerDash playerDash;
 
-    private void Awake()
+    public void Initialize(PlayerComponents playerComponents)
     {
-        rigidbody2d = GetComponent<Rigidbody2D>();
-        collider2d = GetComponent<Collider2D>();
-        playerInputHandler = GetComponent<PlayerInputHandler>();
-        playerDash = GetComponent<PlayerDash>();
+        rigidbody2d = playerComponents.rigidbody2d;
+        collider2d = playerComponents.collider2d;
+        playerInputHandler = playerComponents.playerInputHandler;
+        playerDash = playerComponents.playerDash;
     }
 
     private void FixedUpdate()

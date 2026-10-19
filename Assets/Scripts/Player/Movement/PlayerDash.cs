@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(PlayerMovement), typeof(PlayerInputHandler))]
 public class PlayerDash : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float dashSpeed = 30f;
@@ -19,11 +18,11 @@ public class PlayerDash : MonoBehaviour
     private float nextDashTime;
     private float gravityBeforeDash;
 
-    private void Awake()
+    public void Initialize(PlayerComponents playerComponents)
     {
-        rigidbody2d = GetComponent<Rigidbody2D>();
-        playerInputHandler = GetComponent<PlayerInputHandler>();
-        playerMovement = GetComponent<PlayerMovement>();
+        rigidbody2d = playerComponents.rigidbody2d;
+        playerInputHandler = playerComponents.playerInputHandler;
+        playerMovement = playerComponents.playerMovement;
     }
 
     private void FixedUpdate()

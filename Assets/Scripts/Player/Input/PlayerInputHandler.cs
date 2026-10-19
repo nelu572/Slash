@@ -7,10 +7,10 @@ public class PlayerInputHandler : MonoBehaviour
     private PlayerMovement playerMovement;
     private PlayerDash playerDash;
 
-    private void Awake()
+    public void Initialize(PlayerComponents playerComponents)
     {
-        playerMovement = GetComponent<PlayerMovement>();
-        playerDash = GetComponent<PlayerDash>();
+        playerMovement = playerComponents.playerMovement;
+        playerDash = playerComponents.playerDash;
     }
 
     public void OnMove(InputAction.CallbackContext context)
