@@ -132,8 +132,9 @@ GameObject:
   - component: {fileID: 298779443}
   - component: {fileID: 298779442}
   - component: {fileID: 298779446}
-  - component: {fileID: 298779447}
   - component: {fileID: 298779448}
+  - component: {fileID: 298779449}
+  - component: {fileID: 298779447}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -360,6 +361,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 9448694d-ffad-49de-a5ad-1f3e3f53893e
     m_ActionName: Player/Jump
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 298779448}
+        m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
+        m_MethodName: OnDash
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 2e2b4643-dd42-465e-a0b5-9f03578287ef
+    m_ActionName: Player/Dash
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -377,6 +394,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca77bd7b601206e42b47cb82790c760d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &298779449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 298779441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92d49eb79159ad742b8379dddacf7d1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dashSpeed: 70
+  dashDuration: 0.2
+  dashCooldown: 0.6
 --- !u!1 &402927452
 GameObject:
   m_ObjectHideFlags: 0

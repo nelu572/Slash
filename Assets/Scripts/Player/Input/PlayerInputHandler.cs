@@ -5,10 +5,12 @@ public class PlayerInputHandler : MonoBehaviour
 {
     public float MoveInput { get; private set; }
     private PlayerMovement playerMovement;
+    private PlayerDash playerDash;
 
     private void Awake()
     {
         playerMovement = GetComponent<PlayerMovement>();
+        playerDash = GetComponent<PlayerDash>();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -20,5 +22,11 @@ public class PlayerInputHandler : MonoBehaviour
     {
         if (context.performed)
             playerMovement.Jump();
+    }
+
+    public void OnDash(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            playerDash.Dash();
     }
 }

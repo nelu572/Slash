@@ -8,19 +8,26 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpSpeed = 14.5f;
     [SerializeField] private LayerMask groundLayer;
 
+    public float MoveSpeed => moveSpeed;
+
     private Rigidbody2D rigidbody2d;
     private Collider2D collider2d;
     private PlayerInputHandler playerInputHandler;
+    private PlayerDash playerDash;
 
     private void Awake()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
         collider2d = GetComponent<Collider2D>();
         playerInputHandler = GetComponent<PlayerInputHandler>();
+        playerDash = GetComponent<PlayerDash>();
     }
 
     private void FixedUpdate()
     {
+        if (playerDash != null && playerDash.IsDashing)
+            return;
+
         float moveInput = playerInputHandler.MoveInput;
         Vector2 velocity = rigidbody2d.linearVelocity;
 
@@ -31,7 +38,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void Jump()
     {
-        if (!OnGround())
+        if ((playerDash != null && playerDash.IsDashing) || !OnGround())
             return;
 
         rigidbody2d.linearVelocity = new Vector2(rigidbody2d.linearVelocity.x, jumpSpeed);
