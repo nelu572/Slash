@@ -301,7 +301,13 @@ MonoBehaviour:
   moveSpeed: 15
   acceleration: 60
   deceleration: 200
-  jumpSpeed: 25
+  jumpSpeed: 32
+  riseGravityMultiplier: 1
+  jumpReleaseMultiplier: 0.75
+  apexSpeedThreshold: 2
+  apexGravityMultiplier: 0.8
+  fallGravityMultiplier: 3
+  fallAccelerationDuration: 0.3
   groundLayer:
     serializedVersion: 2
     m_Bits: 256

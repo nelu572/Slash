@@ -22,6 +22,8 @@ public class PlayerInputHandler : MonoBehaviour
     {
         if (context.performed)
             playerMovement.Jump();
+        else if (context.canceled)
+            playerMovement.ReleaseJump();
     }
 
     public void OnDash(InputAction.CallbackContext context)
