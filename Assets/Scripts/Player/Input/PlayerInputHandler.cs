@@ -5,41 +5,36 @@ public class PlayerInputHandler : MonoBehaviour
 {
     public float MoveInput { get; private set; }
     public float ClimbInput { get; private set; }
-    private PlayerMovement playerMovement;
-    private PlayerDash playerDash;
 
-    public void Initialize(PlayerComponents playerComponents)
+    private Player player;
+
+    public void Initialize(Player player)
     {
-        playerMovement = playerComponents.playerMovement;
-        playerDash = playerComponents.playerDash;
+        this.player = player;
     }
 
-    public void OnMove(InputAction.CallbackContext context)
+    public void OnMove(InputAction.CallbackContext callbackContext)
     {
-        MoveInput = context.ReadValue<float>();
+        MoveInput = callbackContext.ReadValue<float>();
     }
 
-    public void OnClimb(InputAction.CallbackContext context)
+    public void OnClimb(InputAction.CallbackContext callbackContext)
     {
-        ClimbInput = context.ReadValue<float>();
+        ClimbInput = callbackContext.ReadValue<float>();
     }
 
-    public void OnJump(InputAction.CallbackContext context)
+    public void OnJump(InputAction.CallbackContext callbackContext)
     {
-        if (context.performed)
-            playerMovement.Jump();
-        else if (context.canceled)
-            playerMovement.ReleaseJump();
+        if (callbackContext.performed)
+            player.Jump();
+        else if (callbackContext.canceled)
+            player.ReleaseJump();
     }
 
-    public void OnDash(InputAction.CallbackContext context)
+    public void OnDash(InputAction.CallbackContext callbackContext)
     {
-        if (context.performed)
-            playerDash.Dash();
+        if (callbackContext.performed)
+            player.Dash();
     }
 
-    private void OnDisable()
-    {
-        ClimbInput = 0f;
-    }
 }

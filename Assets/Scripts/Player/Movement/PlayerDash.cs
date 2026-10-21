@@ -1,78 +1,60 @@
+using System;
 using UnityEngine;
 
-public class PlayerDash : MonoBehaviour
+[Serializable]
+public sealed class PlayerDash
 {
     [SerializeField, Min(0f)] private float dashSpeed = 30f;
     [SerializeField, Min(0.01f)] private float dashDuration = 0.2f;
     [SerializeField, Min(0f)] private float dashCooldown = 0.6f;
 
     public bool IsDashing { get; private set; }
-
-    private Rigidbody2D rigidbody2d;
-    private PlayerInputHandler playerInputHandler;
-    private PlayerMovement playerMovement;
-    private PlayerWallCling playerWallCling;
+    public float GravityBeforeDash { get; private set; }
+    public Vector2 Velocity => new Vector2(dashDirection * dashSpeed, 0f);
 
     private float facingDirection = 1f;
     private float dashDirection;
-    private float dashEndTime;
-    private float nextDashTime;
-    private float gravityBeforeDash;
+    private float dashRemainingTime;
+    private float cooldownRemainingTime;
 
-    public void Initialize(PlayerComponents playerComponents)
+    public bool TryStart(float moveInput, float gravityScale)
     {
-        rigidbody2d = playerComponents.rigidbody2d;
-        playerInputHandler = playerComponents.playerInputHandler;
-        playerMovement = playerComponents.playerMovement;
-        playerWallCling = playerComponents.playerWallCling;
+        if (IsDashing || cooldownRemainingTime > 0f)
+            return false;
+
+        UpdateFacing(moveInput);
+        dashDirection = facingDirection;
+        dashRemainingTime = dashDuration;
+        GravityBeforeDash = gravityScale;
+        IsDashing = true;
+        return true;
     }
 
-    private void FixedUpdate()
+    public bool UpdateDash(float moveInput, float moveSpeed, ref Vector2 velocity)
     {
+        cooldownRemainingTime = Mathf.Max(0f, cooldownRemainingTime - Time.fixedDeltaTime);
+
         if (IsDashing)
         {
-            if (Time.fixedTime < dashEndTime)
+            dashRemainingTime -= Time.fixedDeltaTime;
+            if (dashRemainingTime > 0f)
             {
-                rigidbody2d.linearVelocity = new Vector2(dashDirection * dashSpeed, 0f);
-                return;
+                velocity = Velocity;
+                return true;
             }
 
-            EndDash();
+            IsDashing = false;
+            cooldownRemainingTime = dashCooldown;
+            velocity = new Vector2(Mathf.Clamp(velocity.x, -moveSpeed, moveSpeed), 0f);
         }
 
-        float moveInput = playerInputHandler.MoveInput;
-        if (moveInput != 0f)
-            facingDirection = Mathf.Sign(moveInput);
+        UpdateFacing(moveInput);
+        return false;
     }
 
-    public void Dash()
+    private void UpdateFacing(float moveInput)
     {
-        if (!isActiveAndEnabled || IsDashing || Time.time < nextDashTime)
-            return;
-
-        float moveInput = playerInputHandler.MoveInput;
         if (moveInput != 0f)
             facingDirection = Mathf.Sign(moveInput);
-
-        dashDirection = facingDirection;
-        dashEndTime = Time.time + dashDuration;
-        nextDashTime = dashEndTime + dashCooldown;
-        gravityBeforeDash = rigidbody2d.gravityScale;
-        IsDashing = true;
-
-        if (playerWallCling != null)
-            playerWallCling.Release();
-
-        rigidbody2d.gravityScale = 0f;
-        rigidbody2d.linearVelocity = new Vector2(dashDirection * dashSpeed, 0f);
-    }
-
-    private void EndDash()
-    {
-        IsDashing = false;
-        rigidbody2d.gravityScale = gravityBeforeDash;
-        float moveSpeed = playerMovement.MoveSpeed;
-        rigidbody2d.linearVelocity = new Vector2(
-            Mathf.Clamp(rigidbody2d.linearVelocity.x, -moveSpeed, moveSpeed), 0f);
     }
 }

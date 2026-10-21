@@ -131,12 +131,9 @@ GameObject:
   - component: {fileID: 298779444}
   - component: {fileID: 298779443}
   - component: {fileID: 298779442}
-  - component: {fileID: 298779446}
   - component: {fileID: 298779448}
-  - component: {fileID: 298779449}
-  - component: {fileID: 298779451}
-  - component: {fileID: 298779447}
   - component: {fileID: 298779450}
+  - component: {fileID: 298779447}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -287,34 +284,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &298779446
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 298779441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04dc73b91764d294d942ca32e326ddab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 15
-  acceleration: 60
-  deceleration: 200
-  jumpSpeed: 32
-  riseGravityMultiplier: 1
-  jumpReleaseMultiplier: 0.75
-  wallJumpHorizontalSpeed: 14
-  wallJumpForce: 20
-  wallJumpAirResistance: 4
-  apexSpeedThreshold: 2
-  apexGravityMultiplier: 0.8
-  fallGravityMultiplier: 3
-  fallAccelerationDuration: 0.3
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
 --- !u!114 &298779447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -421,21 +390,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca77bd7b601206e42b47cb82790c760d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &298779449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 298779441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92d49eb79159ad742b8379dddacf7d1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dashSpeed: 70
-  dashDuration: 0.2
-  dashCooldown: 0.6
 --- !u!114 &298779450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,27 +402,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e46e76daf8eedf4d97844d9fdcee803, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &298779451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 298779441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fee3568cba72bc4789f37048f39c0ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  wallCheckDistance: 0.05
-  climbSpeed: 12
-  climbDownSpeed: 12
-  wallSlideSpeed: 3
-  wallSlideDelay: 0.12
-  wallSlideRampDuration: 0.18
+  playerMovement:
+    moveSpeed: 15
+    acceleration: 60
+    deceleration: 200
+    groundLayer:
+      serializedVersion: 2
+      m_Bits: 256
+  playerJump:
+    jumpSpeed: 32
+    riseGravityMultiplier: 1
+    jumpReleaseMultiplier: 0.75
+    wallJumpHorizontalSpeed: 14
+    wallJumpForce: 20
+    wallJumpAirResistance: 4
+    apexSpeedThreshold: 2
+    apexGravityMultiplier: 0.8
+    fallGravityMultiplier: 3
+    fallAccelerationDuration: 0.3
+  playerDash:
+    dashSpeed: 70
+    dashDuration: 0.2
+    dashCooldown: 0.6
+  playerWallCling:
+    wallLayer:
+      serializedVersion: 2
+      m_Bits: 256
+    wallCheckDistance: 0.05
+    climbSpeed: 12
+    climbDownSpeed: 12
+    wallSlideSpeed: 3
+    wallSlideDelay: 0.12
+    wallSlideRampDuration: 0.18
 --- !u!1 &402927452
 GameObject:
   m_ObjectHideFlags: 0
