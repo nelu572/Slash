@@ -4,6 +4,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 [RequireComponent(typeof(PlayerMovement), typeof(PlayerDash), typeof(PlayerInputHandler))]
+[RequireComponent(typeof(PlayerWallCling))]
 public class Player : MonoBehaviour
 {
     private void Awake()
@@ -20,6 +21,7 @@ public class Player : MonoBehaviour
             collider2d = GetComponent<Collider2D>(),
             playerMovement = GetComponent<PlayerMovement>(),
             playerDash = GetComponent<PlayerDash>(),
+            playerWallCling = GetComponent<PlayerWallCling>(),
             playerInputHandler = GetComponent<PlayerInputHandler>()
         };
     }
@@ -28,6 +30,7 @@ public class Player : MonoBehaviour
     {
         playerComponents.playerMovement.Initialize(playerComponents);
         playerComponents.playerDash.Initialize(playerComponents);
+        playerComponents.playerWallCling.Initialize(playerComponents);
         playerComponents.playerInputHandler.Initialize(playerComponents);
     }
 }

@@ -12,6 +12,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, Min(1f)] private float riseGravityMultiplier = 1f;
     [SerializeField, Range(0f, 1f)] private float jumpReleaseMultiplier = 0.75f;
 
+    [Header("벽 점프")]
+    [SerializeField, Min(0f)] private float wallJumpHorizontalSpeed = 14f;
+    [SerializeField, Min(0f)] private float wallJumpForce = 20f;
+    [SerializeField, Min(0.01f)] private float wallJumpAirResistance = 4f;
+
     [Header("정점 체류")]
     [SerializeField, Min(0.01f)] private float apexSpeedThreshold = 2f;
     [SerializeField, Range(0.01f, 1f)] private float apexGravityMultiplier = 0.7f;
@@ -29,12 +34,14 @@ public class PlayerMovement : MonoBehaviour
     private Collider2D collider2d;
     private PlayerInputHandler playerInputHandler;
     private PlayerDash playerDash;
+    private PlayerWallCling playerWallCling;
     private bool canAirJump = true;
     private bool canCutJump;
     private bool canHangAtApex;
     private bool jumpNeedsPhysicsStep;
     private bool hasPendingAirJump;
     private float fallTime;
+    private int wallJumpDirection;
 
     public void Initialize(PlayerComponents playerComponents)
     {
@@ -42,6 +49,7 @@ public class PlayerMovement : MonoBehaviour
         collider2d = playerComponents.collider2d;
         playerInputHandler = playerComponents.playerInputHandler;
         playerDash = playerComponents.playerDash;
+        playerWallCling = playerComponents.playerWallCling;
     }
 
     private void FixedUpdate()
@@ -49,6 +57,7 @@ public class PlayerMovement : MonoBehaviour
         bool isGrounded = OnGround();
         if (isGrounded)
         {
+            wallJumpDirection = 0;
             canAirJump = true;
             canCutJump = false;
             canHangAtApex = false;
@@ -59,6 +68,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (playerDash != null && playerDash.IsDashing)
         {
+            wallJumpDirection = 0;
             if (hasPendingAirJump)
                 canAirJump = true;
 
@@ -68,6 +78,23 @@ public class PlayerMovement : MonoBehaviour
             hasPendingAirJump = false;
             fallTime = 0f;
             return;
+        }
+
+        if (playerWallCling != null && playerWallCling.TryCling(isGrounded))
+        {
+            wallJumpDirection = 0;
+            canCutJump = false;
+            canHangAtApex = false;
+            jumpNeedsPhysicsStep = false;
+            hasPendingAirJump = false;
+            fallTime = 0f;
+            return;
+        }
+
+        if (wallJumpDirection != 0 && playerWallCling != null
+            && playerWallCling.IsTouchingWall(wallJumpDirection))
+        {
+            wallJumpDirection = 0;
         }
 
         // 같은 물리 프레임에 들어온 두 점프가 하나의 도약으로 합쳐지지 않게 한다.
@@ -81,8 +108,19 @@ public class PlayerMovement : MonoBehaviour
         float moveInput = playerInputHandler.MoveInput;
         Vector2 velocity = rigidbody2d.linearVelocity;
 
-        float rate = moveInput == 0f ? deceleration : acceleration;
-        velocity.x = Mathf.MoveTowards(velocity.x, moveInput * moveSpeed, rate * Time.fixedDeltaTime);
+        // 벽 점프의 힘과 방향 입력을 합산해 공중에서도 궤적을 조절할 수 있게 한다.
+        if (wallJumpDirection != 0)
+        {
+            float inputForce = moveInput * acceleration * rigidbody2d.mass;
+            float pushForce = wallJumpDirection * wallJumpForce;
+            float resistanceForce = -velocity.x * wallJumpAirResistance * rigidbody2d.mass;
+            rigidbody2d.AddForce(Vector2.right * (pushForce + inputForce + resistanceForce), ForceMode2D.Force);
+        }
+        else
+        {
+            float rate = moveInput == 0f ? deceleration : acceleration;
+            velocity.x = Mathf.MoveTowards(velocity.x, moveInput * moveSpeed, rate * Time.fixedDeltaTime);
+        }
 
         if (!isGrounded)
         {
@@ -120,6 +158,17 @@ public class PlayerMovement : MonoBehaviour
         if (playerDash != null && playerDash.IsDashing)
             return;
 
+        if (playerWallCling != null && playerWallCling.CanWallJump)
+        {
+            int jumpDirection = -playerWallCling.WallDirection;
+            bool hadAirJump = canAirJump;
+            ApplyJump(true);
+            canAirJump = hadAirJump;
+            wallJumpDirection = jumpDirection;
+            rigidbody2d.linearVelocity = new Vector2(jumpDirection * wallJumpHorizontalSpeed, jumpSpeed);
+            return;
+        }
+
         bool isGrounded = OnGround();
         if (!isGrounded && !canAirJump)
             return;
@@ -137,6 +186,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyJump(bool isGrounded)
     {
+        if (playerWallCling != null)
+            playerWallCling.Release(true);
+
         canAirJump = isGrounded;
         canCutJump = isGrounded;
         canHangAtApex = true;
@@ -170,5 +222,10 @@ public class PlayerMovement : MonoBehaviour
         var size = new Vector2(bounds.size.x * 0.9f, 0.1f);
         
         return Physics2D.OverlapBox(position, size, 0f, groundLayer) != null;
+    }
+
+    private void OnDisable()
+    {
+        wallJumpDirection = 0;
     }
 }

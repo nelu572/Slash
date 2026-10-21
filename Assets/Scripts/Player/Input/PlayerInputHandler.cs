@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
     public float MoveInput { get; private set; }
+    public float ClimbInput { get; private set; }
     private PlayerMovement playerMovement;
     private PlayerDash playerDash;
 
@@ -18,6 +19,11 @@ public class PlayerInputHandler : MonoBehaviour
         MoveInput = context.ReadValue<float>();
     }
 
+    public void OnClimb(InputAction.CallbackContext context)
+    {
+        ClimbInput = context.ReadValue<float>();
+    }
+
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -30,5 +36,10 @@ public class PlayerInputHandler : MonoBehaviour
     {
         if (context.performed)
             playerDash.Dash();
+    }
+
+    private void OnDisable()
+    {
+        ClimbInput = 0f;
     }
 }

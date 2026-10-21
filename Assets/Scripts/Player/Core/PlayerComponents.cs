@@ -6,5 +6,6 @@ public struct PlayerComponents
     public Collider2D collider2d;
     public PlayerMovement playerMovement;
     public PlayerDash playerDash;
+    public PlayerWallCling playerWallCling;
     public PlayerInputHandler playerInputHandler;
 }

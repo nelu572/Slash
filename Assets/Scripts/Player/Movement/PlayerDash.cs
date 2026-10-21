@@ -11,6 +11,7 @@ public class PlayerDash : MonoBehaviour
     private Rigidbody2D rigidbody2d;
     private PlayerInputHandler playerInputHandler;
     private PlayerMovement playerMovement;
+    private PlayerWallCling playerWallCling;
 
     private float facingDirection = 1f;
     private float dashDirection;
@@ -23,6 +24,7 @@ public class PlayerDash : MonoBehaviour
         rigidbody2d = playerComponents.rigidbody2d;
         playerInputHandler = playerComponents.playerInputHandler;
         playerMovement = playerComponents.playerMovement;
+        playerWallCling = playerComponents.playerWallCling;
     }
 
     private void FixedUpdate()
@@ -57,6 +59,9 @@ public class PlayerDash : MonoBehaviour
         nextDashTime = dashEndTime + dashCooldown;
         gravityBeforeDash = rigidbody2d.gravityScale;
         IsDashing = true;
+
+        if (playerWallCling != null)
+            playerWallCling.Release();
 
         rigidbody2d.gravityScale = 0f;
         rigidbody2d.linearVelocity = new Vector2(dashDirection * dashSpeed, 0f);
