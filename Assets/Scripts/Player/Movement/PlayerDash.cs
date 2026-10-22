@@ -9,6 +9,7 @@ public sealed class PlayerDash
     [SerializeField, Min(0f)] private float dashCooldown = 0.6f;
 
     public bool IsDashing { get; private set; }
+    public int Direction => (int)dashDirection;
     public float GravityBeforeDash { get; private set; }
     public Vector2 Velocity => new Vector2(dashDirection * dashSpeed, 0f);
 

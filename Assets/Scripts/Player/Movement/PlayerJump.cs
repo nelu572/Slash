@@ -37,6 +37,8 @@ public sealed class PlayerJump
     [SerializeField, Min(0.01f)] private float fallAccelerationDuration = 0.18f;
 
     public int WallJumpDirection { get; private set; }
+    public int JumpSequence { get; private set; }
+    public bool IsAirJump { get; private set; }
 
     private bool canAirJump = true;
     private bool canCutJump;
@@ -127,6 +129,7 @@ public sealed class PlayerJump
 
     public void Land()
     {
+        IsAirJump = false;
         canAirJump = true;
         WallJumpDirection = 0;
         canCutJump = false;
@@ -136,6 +139,7 @@ public sealed class PlayerJump
 
     public void Interrupt()
     {
+        IsAirJump = false;
         jumpInputs.Clear();
         WallJumpDirection = 0;
         canCutJump = false;
@@ -168,5 +172,7 @@ public sealed class PlayerJump
         canHangAtApex = true;
         fallTime = 0f;
         velocity.y = jumpSpeed;
+        IsAirJump = jumpType == JumpType.Air;
+        JumpSequence++;
     }
 }

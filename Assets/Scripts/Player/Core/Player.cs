@@ -6,12 +6,16 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerInputHandler))]
 public class Player : MonoBehaviour
 {
+    [SerializeField] private PlayerAnimation playerAnimation;
     [SerializeField] private PlayerMovement playerMovement = new PlayerMovement();
     [SerializeField] private PlayerJump playerJump = new PlayerJump();
     [SerializeField] private PlayerDash playerDash = new PlayerDash();
     [SerializeField] private PlayerWallCling playerWallCling = new PlayerWallCling();
 
     public PlayerState State { get; private set; } = PlayerState.Airborne;
+    public int FacingDirection { get; private set; } = 1;
+    public int JumpSequence => playerJump.JumpSequence;
+    public bool IsAirJump => playerJump.IsAirJump;
 
     private Rigidbody2D rigidbody2d;
     private PlayerInputHandler playerInputHandler;
@@ -19,12 +23,35 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
-        var collider2d = GetComponent<Collider2D>();
+        BoxCollider2D collider2d = GetComponent<BoxCollider2D>();
         playerInputHandler = GetComponent<PlayerInputHandler>();
 
         playerMovement.Initialize(rigidbody2d, collider2d);
         playerWallCling.Initialize(rigidbody2d, collider2d);
         playerInputHandler.Initialize(this);
+
+        if (playerAnimation != null)
+            playerAnimation.Initialize(this, rigidbody2d, playerInputHandler);
+    }
+
+    private void Update()
+    {
+        switch (State)
+        {
+            case PlayerState.Wall:
+                FacingDirection = playerWallCling.WallDirection;
+                break;
+            case PlayerState.WallJumping:
+                FacingDirection = playerJump.WallJumpDirection;
+                break;
+            case PlayerState.Dashing:
+                FacingDirection = playerDash.Direction;
+                break;
+            default:
+                if (playerInputHandler.MoveInput != 0f)
+                    FacingDirection = (int)Mathf.Sign(playerInputHandler.MoveInput);
+                break;
+        }
     }
 
     /// <summary>
