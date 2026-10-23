@@ -69,6 +69,8 @@ public class Player : MonoBehaviour
         if (playerDash.UpdateDash(playerInputHandler.MoveInput, playerMovement.MoveSpeed, ref velocity))
         {
             playerJump.Interrupt();
+            // 대시 보정 적용 순서: 수평 속도를 적용하기 전에 모서리에 걸린 위치부터 위로 보정한다.
+            playerMovement.CorrectDashCorner(velocity);
             rigidbody2d.linearVelocity = velocity;
             State = PlayerState.Dashing;
             return;
@@ -120,7 +122,7 @@ public class Player : MonoBehaviour
         float horizontalForce = 0f;
         if (State == PlayerState.WallJumping)
         {
-            horizontalForce = playerJump.GetHorizontalForce(playerInputHandler.MoveInput * playerMovement.Acceleration,
+            horizontalForce = playerJump.GetHorizontalForce(playerInputHandler.MoveInput,
                 velocity.x, rigidbody2d.mass);
         }
         else
@@ -136,6 +138,8 @@ public class Player : MonoBehaviour
         }
 
         // -------- 물리 결과 적용 -------- 
+        // 천장 보정 적용 순서: 최종 이동 속도를 적용하기 전에 머리가 걸린 모서리에서 벗어난다.
+        playerMovement.CorrectCeilingCorner(velocity);
         rigidbody2d.linearVelocity = velocity;
         rigidbody2d.AddForce(Vector2.right * horizontalForce);
     }
@@ -164,6 +168,8 @@ public class Player : MonoBehaviour
 
         playerWallCling.Release();
         playerJump.Interrupt();
+        // 대시 보정 시작 조건: 대시 시작에 성공한 경우에만 보정 한도를 새로 사용할 수 있게 한다.
+        playerMovement.ResetDashCorrection();
         rigidbody2d.gravityScale = 0f;
         rigidbody2d.linearVelocity = playerDash.Velocity;
         State = PlayerState.Dashing;

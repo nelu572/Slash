@@ -23,9 +23,14 @@ public sealed class PlayerJump
     [SerializeField, Min(1f)] private float riseGravityMultiplier = 1f;
     [SerializeField, Range(0f, 1f)] private float jumpReleaseMultiplier = 0.75f;
 
+    [Header("점프 입력 보정")]
+    [SerializeField, Min(0f)] private float coyoteTime = 0.1f;
+    [SerializeField, Min(0f)] private float jumpBufferTime = 0.12f;
+
     [Header("벽 점프")]
     [SerializeField, Min(0f)] private float wallJumpHorizontalSpeed = 14f;
     [SerializeField, Min(0f)] private float wallJumpForce = 20f;
+    [SerializeField, Min(0f)] private float wallJumpInputAcceleration = 60f;
     [SerializeField, Min(0.01f)] private float wallJumpAirResistance = 4f;
 
     [Header("정점 체류")]
@@ -43,6 +48,10 @@ public sealed class PlayerJump
     private bool canAirJump = true;
     private bool canCutJump;
     private bool canHangAtApex;
+    private bool hasBufferedJump;
+    private bool bufferedJumpReleased;
+    private float coyoteExpiresAt = float.NegativeInfinity;
+    private float jumpBufferExpiresAt = float.NegativeInfinity;
     private readonly Queue<JumpInput> jumpInputs = new Queue<JumpInput>();
     private float fallTime;
 
@@ -57,6 +66,10 @@ public sealed class PlayerJump
     /// </summary>
     public bool UpdateJump(bool isGrounded, int wallJumpDirection, ref Vector2 velocity)
     {
+        // 점프 버퍼 만료: 보관 시간이 지난 입력을 버린다.
+        if (Time.time > jumpBufferExpiresAt)
+            hasBufferedJump = false;
+
         bool appliedJump = false;
         while (jumpInputs.Count > 0)
         {
@@ -65,6 +78,9 @@ public sealed class PlayerJump
             if (jumpInputs.Peek() == JumpInput.Release)
             {
                 jumpInputs.Dequeue();
+                // 버튼 해제 기록: 보관 중인 입력으로 나중에 점프해도 짧게 누른 높이를 유지한다.
+                if (hasBufferedJump)
+                    bufferedJumpReleased = true;
                 ReleaseJump(ref velocity);
                 continue;
             }
@@ -75,21 +91,46 @@ public sealed class PlayerJump
             }
 
             jumpInputs.Dequeue();
-            JumpType jumpType;
-            if (wallJumpDirection != 0)
-                jumpType = JumpType.Wall;
-            else if (isGrounded)
-                jumpType = JumpType.Ground;
-            else if (canAirJump)
-                jumpType = JumpType.Air;
-            else
-                continue;
-
-            ApplyJump(jumpType, wallJumpDirection, ref velocity);
-            appliedJump = true;
+            // 점프 버퍼 저장: 새 누름으로 보관 시간을 갱신하고 가능한 점프가 있으면 즉시 실행한다.
+            hasBufferedJump = true;
+            bufferedJumpReleased = false;
+            jumpBufferExpiresAt = Time.time + jumpBufferTime;
+            appliedJump = TryBufferedJump(isGrounded, wallJumpDirection, ref velocity);
         }
 
+        // 점프 버퍼 재시도: 이번에 새 입력이 없어도 착지나 벽 접촉으로 실행 가능해졌는지 확인한다.
+        if (!appliedJump)
+            appliedJump = TryBufferedJump(isGrounded, wallJumpDirection, ref velocity);
+
         return appliedJump;
+    }
+
+    /// <summary>
+    /// 점프 버퍼 실행: 보관한 입력을 한 번 소모하며 벽 점프, 지상·코요테 점프, 공중 점프 순으로 선택한다.
+    /// </summary>
+    private bool TryBufferedJump(bool isGrounded, int wallJumpDirection, ref Vector2 velocity)
+    {
+        if (!hasBufferedJump)
+            return false;
+
+        JumpType jumpType;
+        if (wallJumpDirection != 0)
+            jumpType = JumpType.Wall;
+        else if (isGrounded || Time.time < coyoteExpiresAt)
+            jumpType = JumpType.Ground;
+        else if (canAirJump)
+            jumpType = JumpType.Air;
+        else
+            return false;
+
+        hasBufferedJump = false;
+        ApplyJump(jumpType, wallJumpDirection, ref velocity);
+
+        // 예약된 해제 반영: 버퍼 대기 중 버튼을 놓았다면 방금 실행한 점프의 높이를 줄인다.
+        if (bufferedJumpReleased)
+            ReleaseJump(ref velocity);
+
+        return true;
     }
 
     private void ReleaseJump(ref Vector2 velocity)
@@ -100,10 +141,11 @@ public sealed class PlayerJump
             velocity.y *= jumpReleaseMultiplier;
     }
 
-    public float GetHorizontalForce(float inputAcceleration, float horizontalVelocity, float mass)
+    public float GetHorizontalForce(float moveInput, float horizontalVelocity, float mass)
     {
+        // 벽 점프 입력 가속은 기본 이동의 출발·반전 가속도와 별도로 적용한다.
         return WallJumpDirection * wallJumpForce
-            + inputAcceleration * mass
+            + moveInput * wallJumpInputAcceleration * mass
             - horizontalVelocity * wallJumpAirResistance * mass;
     }
 
@@ -129,6 +171,8 @@ public sealed class PlayerJump
 
     public void Land()
     {
+        // 코요테 타임 갱신: 접지 중 지상 점프 유예의 만료 시각을 계속 연장한다.
+        coyoteExpiresAt = Time.time + coyoteTime;
         IsAirJump = false;
         canAirJump = true;
         WallJumpDirection = 0;
@@ -141,6 +185,10 @@ public sealed class PlayerJump
     {
         IsAirJump = false;
         jumpInputs.Clear();
+        // 점프 보정 취소: 대시·벽 붙기로 전환하면 남은 점프 버퍼와 코요테 타임을 버린다.
+        hasBufferedJump = false;
+        bufferedJumpReleased = false;
+        coyoteExpiresAt = float.NegativeInfinity;
         WallJumpDirection = 0;
         canCutJump = false;
         canHangAtApex = false;
@@ -154,6 +202,8 @@ public sealed class PlayerJump
 
     private void ApplyJump(JumpType jumpType, int wallJumpDirection, ref Vector2 velocity)
     {
+        // 코요테 타임 소모: 점프가 실행되면 지상 점프 유예를 끝내 중복 사용을 막는다.
+        coyoteExpiresAt = float.NegativeInfinity;
         switch (jumpType)
         {
             case JumpType.Ground:

@@ -406,17 +406,23 @@ MonoBehaviour:
   playerAnimation: {fileID: 1802530302}
   playerMovement:
     moveSpeed: 15
-    acceleration: 60
-    deceleration: 200
+    acceleration: 150
+    deceleration: 120
+    turnAcceleration: 240
     groundLayer:
       serializedVersion: 2
       m_Bits: 256
+    ceilingCorrectionDistance: 0.15
+    dashCorrectionDistance: 0.15
   playerJump:
     jumpSpeed: 32
     riseGravityMultiplier: 1
     jumpReleaseMultiplier: 0.75
+    coyoteTime: 0.1
+    jumpBufferTime: 0.12
     wallJumpHorizontalSpeed: 14
     wallJumpForce: 20
+    wallJumpInputAcceleration: 60
     wallJumpAirResistance: 4
     apexSpeedThreshold: 2
     apexGravityMultiplier: 0.8
@@ -431,6 +437,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 256
     wallCheckDistance: 0.05
+    wallJumpGraceTime: 0.08
     climbSpeed: 12
     climbDownSpeed: 12
     wallSlideSpeed: 3
