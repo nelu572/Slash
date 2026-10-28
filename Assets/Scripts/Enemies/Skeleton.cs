@@ -4,8 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 public class Skeleton : MonoBehaviour
 {
-    [SerializeField] private Player target; // 거리 제한 없이 추적할 플레이어
-    [SerializeField] private SkeletonAnimation skeletonAnimation; // 모션 재생과 스프라이트 방향 전환 담당
+    [SerializeField] private Player target;
+    [SerializeField] private SkeletonAnimation skeletonAnimation;
     [SerializeField] private LayerMask groundLayer; // 접지·장애물·착지 바닥 검사에 사용할 지형 레이어
     [SerializeField, Min(0f)] private float moveSpeed = 2f; // 지상과 공중에서 유지할 수평 이동 속도
     [SerializeField, Min(0f)] private float stopDistance = 1.5f; // 추적을 멈추고 공격을 시도하는 수평 거리
@@ -13,8 +13,8 @@ public class Skeleton : MonoBehaviour
     [SerializeField, Min(0f)] private float attackHeight = 0.75f; // 공격 시작을 허용할 플레이어와의 높이 차이
     [SerializeField, Min(0f)] private float attackDelay = 0.7f; // 공격 모션 종료 후 다음 행동까지 기다릴 시간(초)
 
-    private Rigidbody2D rigidbody2d; // 이동 속도와 중력을 적용할 물리 본체
-    private BoxCollider2D bodyCollider; // 접지와 점프 경로 검사에 사용할 몸통 영역
+    private Rigidbody2D rigidbody2d;
+    private BoxCollider2D bodyCollider;
     private float attackRemainingTime; // 현재 공격 모션이 끝날 때까지 남은 시간
     private float delayRemainingTime; // 공격 후 대기를 끝낼 때까지 남은 시간
     private float jumpDirection; // 점프·낙하 중 유지할 수평 방향. 왼쪽 -1, 오른쪽 1, 미사용 0

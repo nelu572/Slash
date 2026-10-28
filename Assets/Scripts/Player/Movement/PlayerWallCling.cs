@@ -5,29 +5,29 @@ using UnityEngine;
 public sealed class PlayerWallCling
 {
     [Header("벽 감지")]
-    [SerializeField] private LayerMask wallLayer;
-    [SerializeField, Min(0.01f)] private float wallCheckDistance = 0.05f;
-    [SerializeField, Min(0f)] private float wallJumpGraceTime = 0.08f;
+    [SerializeField] private LayerMask wallLayer; // 등반과 벽 점프를 허용할 지형 레이어
+    [SerializeField, Min(0.01f)] private float wallCheckDistance = 0.05f; // 몸통 옆면 바깥으로 검사할 추가 거리(유닛)
+    [SerializeField, Min(0f)] private float wallJumpGraceTime = 0.08f; // 벽을 떠난 뒤에도 벽 점프를 허용할 유예시간(초)
 
     [Header("벽 이동")]
     [SerializeField, Min(0f)] private float climbSpeed = 9f;
     [SerializeField, Min(0f)] private float climbDownSpeed = 12f;
-    [SerializeField, Min(0.01f)] private float wallSlideSpeed = 3f;
-    [SerializeField, Min(0f)] private float wallSlideDelay = 0.12f;
-    [SerializeField, Min(0.01f)] private float wallSlideRampDuration = 0.18f;
+    [SerializeField, Min(0.01f)] private float wallSlideSpeed = 3f; // 상하 입력이 없을 때 자동 미끄러짐이 도달할 하강 속도
+    [SerializeField, Min(0f)] private float wallSlideDelay = 0.12f; // 상하 입력이 없을 때 미끄러지기 전 대기시간(초)
+    [SerializeField, Min(0.01f)] private float wallSlideRampDuration = 0.18f; // 미끄러짐이 목표 속도까지 빨라지는 시간(초)
 
     public bool IsClinging { get; private set; }
-    public int WallDirection { get; private set; }
-    public int WallJumpDirection { get; private set; }
+    public int WallDirection { get; private set; } // 감지한 벽의 방향. 왼쪽 -1, 오른쪽 1, 없음 0
+    public int WallJumpDirection { get; private set; } // 현재 벽 접촉 또는 유예로 허용되는 점프 방향. 0이면 불가
 
     private Rigidbody2D rigidbody2d;
     private Collider2D collider2d;
-    private readonly RaycastHit2D[] wallHits = new RaycastHit2D[8];
-    private bool canCling;
-    private int releasedWallDirection;
-    private int lastWallJumpDirection;
-    private float wallJumpExpiresAt = float.NegativeInfinity;
-    private float wallSlideTime;
+    private readonly RaycastHit2D[] wallHits = new RaycastHit2D[8]; // 벽 감지마다 재사용할 박스캐스트 결과 버퍼
+    private bool canCling; // 이번 접촉 검사에서 벽 이동이 허용됐는지 여부
+    private int releasedWallDirection; // 벽에서 떨어질 때까지 재부착을 막을 벽 방향
+    private int lastWallJumpDirection; // 접촉이 끊긴 뒤 유예 중에 사용할 마지막 벽 점프 방향
+    private float wallJumpExpiresAt = float.NegativeInfinity; // Time.time 기준 벽 점프 유예 만료 시각(초)
+    private float wallSlideTime; // 입력 없는 대기시간과 미끄러짐 가속시간을 함께 누적
 
     public void Initialize(Rigidbody2D rigidbody2d, Collider2D collider2d)
     {

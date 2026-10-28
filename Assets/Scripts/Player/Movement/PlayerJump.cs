@@ -19,41 +19,41 @@ public sealed class PlayerJump
     }
 
     [Header("점프")]
-    [SerializeField] private float jumpSpeed = 18.5f;
-    [SerializeField, Min(1f)] private float riseGravityMultiplier = 1f;
-    [SerializeField, Range(0f, 1f)] private float jumpReleaseMultiplier = 0.75f;
+    [SerializeField] private float jumpSpeed = 18.5f; // 지상·공중·벽 점프에 공통으로 적용할 상승 속도
+    [SerializeField, Min(1f)] private float riseGravityMultiplier = 1f; // 정점 보정을 제외한 상승 구간의 중력 배율
+    [SerializeField, Range(0f, 1f)] private float jumpReleaseMultiplier = 0.75f; // 지상·벽 점프에서 버튼을 일찍 놓았을 때 남길 상승 속도 비율
 
     [Header("점프 입력 보정")]
-    [SerializeField, Min(0f)] private float coyoteTime = 0.1f;
-    [SerializeField, Min(0f)] private float jumpBufferTime = 0.12f;
+    [SerializeField, Min(0f)] private float coyoteTime = 0.1f; // 발판을 떠난 뒤에도 지상 점프를 허용할 유예시간(초)
+    [SerializeField, Min(0f)] private float jumpBufferTime = 0.12f; // 즉시 실행할 수 없는 점프 입력의 보관 시간(초)
 
     [Header("벽 점프")]
     [SerializeField, Min(0f)] private float wallJumpHorizontalSpeed = 14f;
-    [SerializeField, Min(0f)] private float wallJumpForce = 20f;
-    [SerializeField, Min(0f)] private float wallJumpInputAcceleration = 60f;
-    [SerializeField, Min(0.01f)] private float wallJumpAirResistance = 4f;
+    [SerializeField, Min(0f)] private float wallJumpForce = 20f; // 벽 점프 상태에서 벽 반대 방향으로 계속 가할 수평 힘
+    [SerializeField, Min(0f)] private float wallJumpInputAcceleration = 60f; // 일반 이동과 별도로 조절할 벽 점프 중 좌우 입력 가속도
+    [SerializeField, Min(0.01f)] private float wallJumpAirResistance = 4f; // 수평 속도에 비례해 적용할 저항 계수
 
     [Header("정점 체류")]
-    [SerializeField, Min(0.01f)] private float apexSpeedThreshold = 2f;
-    [SerializeField, Range(0.01f, 1f)] private float apexGravityMultiplier = 0.7f;
+    [SerializeField, Min(0.01f)] private float apexSpeedThreshold = 2f; // 정점 보정을 적용할 수직 속도 절댓값의 상한(유닛/초)
+    [SerializeField, Range(0.01f, 1f)] private float apexGravityMultiplier = 0.7f; // 정점 부근의 체공시간을 늘리기 위해 낮출 중력 배율
 
     [Header("낙하")]
-    [SerializeField, Min(1f)] private float fallGravityMultiplier = 5f;
-    [SerializeField, Min(0.01f)] private float fallAccelerationDuration = 0.18f;
+    [SerializeField, Min(1f)] private float fallGravityMultiplier = 5f; // 낙하 가속 보간이 끝났을 때 도달할 중력 배율
+    [SerializeField, Min(0.01f)] private float fallAccelerationDuration = 0.18f; // 상승 중력에서 낙하 중력까지 증가시키는 시간(초)
 
-    public int WallJumpDirection { get; private set; }
-    public int JumpSequence { get; private set; }
+    public int WallJumpDirection { get; private set; } // 벽 점프 힘을 유지할 방향. 왼쪽 -1, 오른쪽 1, 종료 0
+    public int JumpSequence { get; private set; } // 새 점프를 애니메이션에 알리기 위한 누적 실행 번호
     public bool IsAirJump { get; private set; }
 
     private bool canAirJump = true;
-    private bool canCutJump;
-    private bool canHangAtApex;
+    private bool canCutJump; // 버튼 해제로 상승 속도를 한 번만 줄이기 위한 상태
+    private bool canHangAtApex; // 정점 구간을 벗어난 뒤에는 정점 보정을 다시 적용하지 않도록 관리
     private bool hasBufferedJump;
-    private bool bufferedJumpReleased;
-    private float coyoteExpiresAt = float.NegativeInfinity;
-    private float jumpBufferExpiresAt = float.NegativeInfinity;
-    private readonly Queue<JumpInput> jumpInputs = new Queue<JumpInput>();
-    private float fallTime;
+    private bool bufferedJumpReleased; // 버퍼 대기 중의 버튼 해제를 기억해 짧은 점프에 반영
+    private float coyoteExpiresAt = float.NegativeInfinity; // Time.time 기준 지상 점프 유예 만료 시각(초)
+    private float jumpBufferExpiresAt = float.NegativeInfinity; // Time.time 기준 점프 입력 보관 만료 시각(초)
+    private readonly Queue<JumpInput> jumpInputs = new Queue<JumpInput>(); // 누름·해제 순서를 보존해 물리 갱신에서 처리할 입력 큐
+    private float fallTime; // fallAccelerationDuration까지 누적할 낙하 중력 보간 시간
 
     public void RequestJump(bool isReleased = false)
     {

@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerWallCling playerWallCling = new PlayerWallCling();
 
     public PlayerState State { get; private set; } = PlayerState.Airborne;
-    public int FacingDirection { get; private set; } = 1;
+    public int FacingDirection { get; private set; } = 1; // 바라보는 방향. 왼쪽 -1, 오른쪽 1
     public int JumpSequence => playerJump.JumpSequence;
     public bool IsAirJump => playerJump.IsAirJump;
 

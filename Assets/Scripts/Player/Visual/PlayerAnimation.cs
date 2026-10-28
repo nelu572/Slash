@@ -16,7 +16,7 @@ public class PlayerAnimation : MonoBehaviour
     private Rigidbody2D rigidbody2d;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
-    private int currentJumpSequence;
+    private int currentJumpSequence; // 새 점프만 트리거로 전달하기 위해 마지막으로 반영한 실행 번호
 
     public void Initialize(Player player, Rigidbody2D rigidbody2d, PlayerInputHandler playerInputHandler)
     {

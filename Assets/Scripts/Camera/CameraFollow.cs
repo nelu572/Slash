@@ -5,10 +5,10 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     [SerializeField] private Transform target;
-    [SerializeField] private Vector2 offset = new Vector2(0f, 2.5f);
-    [SerializeField, Min(0f)] private float smoothTime = 0.12f;
+    [SerializeField] private Vector2 offset = new Vector2(0f, 2.5f); // 대상 위치에 더할 화면 구도용 좌우·상하 거리
+    [SerializeField, Min(0f)] private float smoothTime = 0.12f; // 목표 위치에 접근하는 대략적인 시간(초). 0이면 즉시 이동
 
-    private Vector3 followVelocity;
+    private Vector3 followVelocity; // SmoothDamp가 다음 프레임으로 이어갈 이동 속도
 
     private void OnEnable()
     {

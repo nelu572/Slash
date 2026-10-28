@@ -5,25 +5,25 @@ using UnityEngine;
 public sealed class PlayerMovement
 {
     [SerializeField] private float moveSpeed = 8f;
-    [SerializeField, Min(0f)] private float acceleration = 150f;
-    [SerializeField, Min(0f)] private float deceleration = 120f;
-    [SerializeField, Min(0f)] private float turnAcceleration = 240f;
+    [SerializeField, Min(0f)] private float acceleration = 150f; // 출발하거나 같은 방향 입력을 유지할 때의 가속도
+    [SerializeField, Min(0f)] private float deceleration = 120f; // 이동 입력을 놓았을 때 적용할 감속도
+    [SerializeField, Min(0f)] private float turnAcceleration = 240f; // 현재 이동과 반대 방향을 입력했을 때 적용할 가속도
 
     [Header("지면 감지")]
-    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask groundLayer; // 접지와 모서리 보정 경로를 검사할 지형 레이어
 
     [Header("천장 모서리 보정")]
-    [SerializeField, Range(0f, 0.3f)] private float ceilingCorrectionDistance = 0.15f;
+    [SerializeField, Range(0f, 0.3f)] private float ceilingCorrectionDistance = 0.15f; // 천장 모서리를 피하기 위해 옆으로 보정할 최대 거리(유닛)
 
     [Header("대시 모서리 보정")]
-    [SerializeField, Range(0f, 0.3f)] private float dashCorrectionDistance = 0.15f;
+    [SerializeField, Range(0f, 0.3f)] private float dashCorrectionDistance = 0.15f; // 한 대시에서 사용할 누적 수직 보정 한도(유닛)
 
     public float MoveSpeed => moveSpeed;
 
     private Rigidbody2D rigidbody2d;
     private Collider2D collider2d;
-    private float dashCorrectionUsed;
-    private readonly RaycastHit2D[] correctionHits = new RaycastHit2D[8];
+    private float dashCorrectionUsed; // 이번 대시에서 이미 사용한 수직 보정 거리
+    private readonly RaycastHit2D[] correctionHits = new RaycastHit2D[8]; // 보정 경로 검사마다 재사용할 박스캐스트 결과 버퍼
 
     public void Initialize(Rigidbody2D rigidbody2d, Collider2D collider2d)
     {
