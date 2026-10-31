@@ -451,6 +451,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 9cee7929-3a92-4b0c-9e0e-4a6268d5ba06
     m_ActionName: Player/Aim
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 298779448}
+        m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
+        m_MethodName: OnAttack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 8b4651f1-b99d-4a89-873c-ff66610de1fe
+    m_ActionName: Player/Attack
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -520,6 +536,18 @@ MonoBehaviour:
     wallSlideSpeed: 3
     wallSlideDelay: 0.12
     wallSlideRampDuration: 0.18
+  playerAttack:
+    attackClip: {fileID: 7400000, guid: e303fcc2f1a86d242b2f69920efecd78, type: 2}
+    damage: 1
+    hitDelay: 0.2
+    hitOffset: {x: 0.95, y: 0}
+    hitSize: {x: 0.9, y: 1}
+    groundLayer:
+      serializedVersion: 2
+      m_Bits: 256
+  maxHealth: 5
+  knockbackSpeed: 6
+  invincibleDuration: 0.8
 --- !u!1 &402927452
 GameObject:
   m_ObjectHideFlags: 0
@@ -1638,6 +1666,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6de89d19d9901c54cbda77f021fc91c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitClip: {fileID: 7400000, guid: 5c49de51ae855c24291c47a4c5b5368a, type: 2}
 --- !u!95 &1802530303
 Animator:
   serializedVersion: 7

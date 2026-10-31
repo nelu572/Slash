@@ -37,10 +37,22 @@ public class PlayerInputHandler : MonoBehaviour
         if (callbackContext.performed)
             player.Dash();
     }
+
     public void OnAim(InputAction.CallbackContext callbackContext)
     {
         AimInput = callbackContext.ReadValue<Vector2>();
     }
 
+    public void OnAttack(InputAction.CallbackContext callbackContext)
+    {
+        if (callbackContext.performed)
+            player.Attack();
+    }
+
+    private void OnDisable()
+    {
+        MoveInput = 0f;
+        ClimbInput = 0f;
+    }
 
 }

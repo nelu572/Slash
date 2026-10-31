@@ -124,6 +124,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackClip: {fileID: 7400000, guid: bda6a69dab589f842aaf6ab68eff590a, type: 2}
+  hitClip: {fileID: 7400000, guid: 5d514d91c82d0c344a506cc723074d86, type: 2}
+  deathClip: {fileID: 7400000, guid: 1e123ecc60180c2408510d7006804de5, type: 2}
 --- !u!1 &8483258281657911430
 GameObject:
   m_ObjectHideFlags: 0
@@ -249,8 +251,15 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
+  maxHealth: 3
+  detectionRange: 10
   moveSpeed: 2
   stopDistance: 1.5
   jumpHeight: 2.5
   attackHeight: 0.75
   attackDelay: 0.7
+  attackDamage: 1
+  attackHitDelay: 0.25
+  hitOffset: {x: 0.95, y: 0}
+  hitSize: {x: 1.1, y: 1.2}
+  knockbackSpeed: 5

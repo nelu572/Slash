@@ -53,6 +53,12 @@ public sealed class PlayerDash
         return false;
     }
 
+    public void Cancel()
+    {
+        IsDashing = false;
+        cooldownRemainingTime = dashCooldown;
+    }
+
     private void UpdateFacing(float moveInput)
     {
         if (moveInput != 0f)
