@@ -105,7 +105,7 @@ public class Skeleton : MonoBehaviour
             float direction = Mathf.Sign(offset.x);
             if (Mathf.Abs(offset.x) <= stopDistance)
             {
-                if (Mathf.Abs(offset.y) <= attackHeight && IsGrounded()
+                if (Mathf.Abs(offset.y) <= attackHeight && isGrounded
                     && !Physics2D.Linecast(bodyCollider.bounds.center, target.transform.position, groundLayer))
                 {
                     if (Mathf.Abs(offset.x) > 0.01f)

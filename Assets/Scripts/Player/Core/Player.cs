@@ -64,10 +64,8 @@ public class Player : MonoBehaviour
                 FacingDirection = playerDash.Direction;
                 break;
             default:
-                float playerScreenX = Camera.main.WorldToScreenPoint(transform.position).x;
-                float aimOffset = playerInputHandler.AimInput.x - playerScreenX;
-                if (Mathf.Abs(aimOffset) > 1f)
-                    FacingDirection = aimOffset > 0f ? 1 : -1;
+                if (playerInputHandler.MoveInput != 0f)
+                    FacingDirection = (int)Mathf.Sign(playerInputHandler.MoveInput);
                 break;
         }
     }
@@ -199,8 +197,9 @@ public class Player : MonoBehaviour
 
     public void Dash()
     {
+        float direction = playerInputHandler.MoveInput != 0f ? playerInputHandler.MoveInput : FacingDirection;
         if (!isActiveAndEnabled || IsHit || IsDead || State == PlayerState.Dashing
-            || !playerDash.TryStart(playerInputHandler.MoveInput, rigidbody2d.gravityScale))
+            || !playerDash.TryStart(direction, rigidbody2d.gravityScale))
             return;
 
         playerWallCling.Release();
