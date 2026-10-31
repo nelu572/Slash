@@ -48,8 +48,10 @@ public class Player : MonoBehaviour
                 FacingDirection = playerDash.Direction;
                 break;
             default:
-                if (playerInputHandler.MoveInput != 0f)
-                    FacingDirection = (int)Mathf.Sign(playerInputHandler.MoveInput);
+                float playerScreenX = Camera.main.WorldToScreenPoint(transform.position).x;
+                float aimOffset = playerInputHandler.AimInput.x - playerScreenX;
+                if (Mathf.Abs(aimOffset) > 1f)
+                    FacingDirection = aimOffset > 0f ? 1 : -1;
                 break;
         }
     }

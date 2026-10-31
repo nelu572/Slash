@@ -435,6 +435,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: dcbfaa6f-9a39-47cf-a6cd-76cdc6d671e0
     m_ActionName: Player/Climb
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 298779448}
+        m_TargetAssemblyTypeName: PlayerInputHandler, Assembly-CSharp
+        m_MethodName: OnAim
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 9cee7929-3a92-4b0c-9e0e-4a6268d5ba06
+    m_ActionName: Player/Aim
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
