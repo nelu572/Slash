@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [DefaultExecutionOrder(-100)]
 [DisallowMultipleComponent]
@@ -7,6 +8,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerAnimation playerAnimation;
+    [SerializeField] private Slider healthSlider;
     [SerializeField] private PlayerMovement playerMovement = new PlayerMovement();
     [SerializeField] private PlayerJump playerJump = new PlayerJump();
     [SerializeField] private PlayerDash playerDash = new PlayerDash();
@@ -34,6 +36,8 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         CurrentHealth = maxHealth;
+        healthSlider.maxValue = maxHealth;
+        healthSlider.value = CurrentHealth;
         rigidbody2d = GetComponent<Rigidbody2D>();
         BoxCollider2D collider2d = GetComponent<BoxCollider2D>();
         playerInputHandler = GetComponent<PlayerInputHandler>();
@@ -234,6 +238,7 @@ public class Player : MonoBehaviour
             return;
 
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
+        healthSlider.value = CurrentHealth;
         playerAttack.Cancel();
         playerJump.Interrupt();
         playerWallCling.Release();

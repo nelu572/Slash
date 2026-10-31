@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
@@ -6,6 +7,7 @@ public class Skeleton : MonoBehaviour
 {
     [SerializeField] private Player target;
     [SerializeField] private SkeletonAnimation skeletonAnimation;
+    [SerializeField] private Slider healthSlider;
     [SerializeField] private LayerMask groundLayer; // 접지·장애물·착지 바닥 검사에 사용할 지형 레이어
     [SerializeField, Min(1)] private int maxHealth = 3;
     [SerializeField, Min(0f)] private float detectionRange = 10f; // 플레이어 추적을 시작할 거리
@@ -37,6 +39,8 @@ public class Skeleton : MonoBehaviour
     private void Awake()
     {
         CurrentHealth = maxHealth;
+        healthSlider.maxValue = maxHealth;
+        healthSlider.value = CurrentHealth;
         rigidbody2d = GetComponent<Rigidbody2D>();
         bodyCollider = GetComponent<BoxCollider2D>();
         skeletonAnimation.Initialize();
@@ -132,6 +136,7 @@ public class Skeleton : MonoBehaviour
             return;
 
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
+        healthSlider.value = CurrentHealth;
         attackRemainingTime = 0f;
         delayRemainingTime = 0f;
         jumpDirection = 0f;
