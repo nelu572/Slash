@@ -8,6 +8,8 @@ public class Skeleton : MonoBehaviour
     [SerializeField] private Player target;
     [SerializeField] private SkeletonAnimation skeletonAnimation;
     [SerializeField] private Slider healthSlider;
+    [SerializeField] private ParticleSystem hitSparks;
+    [SerializeField] private ParticleSystem hitFlash;
     [SerializeField] private LayerMask groundLayer; // 접지·장애물·착지 바닥 검사에 사용할 지형 레이어
     [SerializeField, Min(1)] private int maxHealth = 3;
     [SerializeField, Min(0f)] private float detectionRange = 10f; // 플레이어 추적을 시작할 거리
@@ -137,6 +139,26 @@ public class Skeleton : MonoBehaviour
 
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
         healthSlider.value = CurrentHealth;
+        if (hitSparks != null)
+        {
+            Bounds bounds = bodyCollider.bounds;
+            hitSparks.transform.position = bounds.center + Vector3.left * (direction * bounds.extents.x);
+            if (hitFlash != null)
+            {
+                hitFlash.transform.position = hitSparks.transform.position;
+                hitFlash.Emit(1);
+            }
+            // 맞은 면의 바깥쪽으로 파편을 부채꼴로 펼치고, 각도에 작은 차이를 준다.
+            for (int i = 0; i < 5; i++)
+            {
+                float angle = (direction > 0 ? 180f : 0f) + (i - 2) * 32f + Random.Range(-6f, 6f);
+                Vector2 velocity = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+                var particle = new ParticleSystem.EmitParams();
+                particle.velocity = velocity * Random.Range(2f, 3.5f);
+                particle.rotation = -angle;
+                hitSparks.Emit(particle, 1);
+            }
+        }
         attackRemainingTime = 0f;
         delayRemainingTime = 0f;
         jumpDirection = 0f;

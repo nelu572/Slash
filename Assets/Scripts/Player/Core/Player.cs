@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerAnimation playerAnimation;
     [SerializeField] private Slider healthSlider;
+    [SerializeField] private CameraHitEffect cameraHitEffect;
     [SerializeField] private PlayerMovement playerMovement = new PlayerMovement();
     [SerializeField] private PlayerJump playerJump = new PlayerJump();
     [SerializeField] private PlayerDash playerDash = new PlayerDash();
@@ -23,6 +24,7 @@ public class Player : MonoBehaviour
     public int JumpSequence => playerJump.JumpSequence;
     public bool IsAirJump => playerJump.IsAirJump;
     public bool IsAttacking => playerAttack.IsAttacking;
+    public int MaxHealth => maxHealth;
     public int CurrentHealth { get; private set; }
     public bool IsDead => CurrentHealth <= 0;
     public bool IsHit => hitRemainingTime > 0f;
@@ -35,8 +37,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        CurrentHealth = maxHealth;
-        healthSlider.maxValue = maxHealth;
+        CurrentHealth = MaxHealth;
+        healthSlider.maxValue = MaxHealth;
         healthSlider.value = CurrentHealth;
         rigidbody2d = GetComponent<Rigidbody2D>();
         BoxCollider2D collider2d = GetComponent<BoxCollider2D>();
@@ -240,6 +242,10 @@ public class Player : MonoBehaviour
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
         healthSlider.value = CurrentHealth;
         playerAttack.Cancel();
+
+        if (cameraHitEffect != null)
+            cameraHitEffect.Play();
+
         playerJump.Interrupt();
         playerWallCling.Release();
         if (playerDash.IsDashing)
