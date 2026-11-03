@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerWallCling playerWallCling = new PlayerWallCling();
     [SerializeField] private PlayerAttack playerAttack = new PlayerAttack();
     [SerializeField, Min(1)] private int maxHealth = 5;
+    [SerializeField] private float fallDeathY = -15f; // 이 월드 Y 좌표 이하로 내려가면 낙사
     [SerializeField, Min(0f)] private float knockbackSpeed = 6f; // 피격 시 밀려날 초기 수평 속도
     [SerializeField, Min(0f)] private float invincibleDuration = 0.8f; // 연속 피격을 막을 무적 시간(초)
 
@@ -81,6 +82,9 @@ public class Player : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
+        if (!IsDead && rigidbody2d.position.y <= fallDeathY)
+            Die();
+
         invincibleRemainingTime = Mathf.Max(0f, invincibleRemainingTime - Time.fixedDeltaTime);
         if (IsDead)
         {
@@ -241,11 +245,39 @@ public class Player : MonoBehaviour
 
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
         healthSlider.value = CurrentHealth;
-        playerAttack.Cancel();
 
         if (cameraHitEffect != null)
             cameraHitEffect.Play();
 
+        FacingDirection = -direction;
+        if (IsDead)
+        {
+            Die();
+            return;
+        }
+
+        InterruptActions();
+        State = PlayerState.Airborne;
+        hitRemainingTime = playerAnimation.HitDuration;
+        invincibleRemainingTime = invincibleDuration;
+        rigidbody2d.linearVelocity = new Vector2(direction * knockbackSpeed,
+            rigidbody2d.linearVelocity.y);
+    }
+
+    private void Die()
+    {
+        CurrentHealth = 0;
+        healthSlider.value = 0;
+        InterruptActions();
+        State = PlayerState.Airborne;
+        hitRemainingTime = 0f;
+        invincibleRemainingTime = 0f;
+        rigidbody2d.linearVelocity = new Vector2(0f, rigidbody2d.linearVelocity.y);
+    }
+
+    private void InterruptActions()
+    {
+        playerAttack.Cancel();
         playerJump.Interrupt();
         playerWallCling.Release();
         if (playerDash.IsDashing)
@@ -253,13 +285,6 @@ public class Player : MonoBehaviour
             rigidbody2d.gravityScale = playerDash.GravityBeforeDash;
             playerDash.Cancel();
         }
-
-        State = PlayerState.Airborne;
-        FacingDirection = -direction;
-        hitRemainingTime = IsDead ? 0f : playerAnimation.HitDuration;
-        invincibleRemainingTime = invincibleDuration;
-        rigidbody2d.linearVelocity = new Vector2(IsDead ? 0f : direction * knockbackSpeed,
-            rigidbody2d.linearVelocity.y);
     }
 
     private void OnDisable()
