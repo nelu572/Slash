@@ -132,6 +132,11 @@ public class Skeleton : MonoBehaviour
             horizontalSpeed != 0f && jumpDirection == 0f && isGrounded, attackRemainingTime > 0f, false);
     }
 
+    public void Initialize(Player player)
+    {
+        target = player;
+    }
+
     public void ReceiveHit(int damage, int direction)
     {
         if (!isActiveAndEnabled || IsDead || damage <= 0)
